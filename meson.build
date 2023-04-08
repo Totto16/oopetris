@@ -10,6 +10,13 @@ project(
     version: '1.0.0-alpha',
 )
 
+if meson.version().version_compare('<0.60.0')
+    error(
+        'meson version must be higher than 0.60.0 to support some used features',
+    )
+endif
+
+
 cpp = meson.get_compiler('cpp')
 if cpp.get_id() == 'msvc'
     add_project_arguments('/std:c++latest', language: 'cpp')
@@ -22,7 +29,7 @@ endif
 deps = []
 
 native = true
-if meson.is_cross_build()
+if meson.is_cross_build() and host_machine.system() == 'android'
     native = false
 endif
 
