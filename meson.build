@@ -32,6 +32,8 @@ elif cpp.get_id() == 'gcc'
             '-Wno-complain-wrong-lang',
             language: 'cpp',
         )
+
+        add_global_arguments('-Wno-shadow', language: 'cpp')
     endif
 
 elif cpp.get_id() == 'clang'
@@ -49,11 +51,22 @@ endif
 
 
 
-sdl2_dep = dependency('sdl2', required: false, native: native)
-if not sdl2_dep.found()
-    deps += dependency('sdl2', required: true, fallback: 'sdl2', native: native)
+if cpp.get_id() == 'gcc' and host_machine.system() == 'windows'
+    deps += dependency(
+        'sdl2',
+        'SDL2',
+        required: true,
+        fallback: 'sdl2',
+        default_options: [
+            'buildtype=release',
+            'optimization=3',
+            'strip=true',
+            'b_ndebug=if-release',
+            'cpp_args=-Wno-shadow',
+        ],
+    )
 else
-    deps += sdl2_dep
+    deps += dependency('sdl2', 'SDL2', required: true, fallback: 'sdl2', native: native)
 endif
 
 sdl2_ttf_dep = dependency('sdl2_ttf', required: false, native: native)
@@ -120,6 +133,9 @@ executable(
     src_files,
     include_directories: inc_dirs,
     dependencies: deps,
+    cpp_args: [
+        
+    ],
     override_options: [
         'warning_level=3',
         'werror=true',
