@@ -21,30 +21,39 @@ endif
 
 deps = []
 
-sdl2_dep = dependency('sdl2', required: false)
+native = true
+if meson.is_cross_build()
+    native = false
+endif
+
+
+
+sdl2_dep = dependency('sdl2', required: false, native: native)
 if not sdl2_dep.found()
-    deps += dependency('sdl2', required: true, fallback: 'sdl2')
+    deps += dependency('sdl2', required: true, fallback: 'sdl2', native: native)
 else
     deps += sdl2_dep
 endif
 
-sdl2_ttf_dep = dependency('sdl2_ttf', required: false)
+sdl2_ttf_dep = dependency('sdl2_ttf', required: false, native: native)
 if not sdl2_ttf_dep.found()
     deps += dependency(
         'sdl2_ttf',
         required: true,
         fallback: 'sdl2_ttf',
+        native: native,
     )
 else
     deps += sdl2_ttf_dep
 endif
 
-spdlog_dep = dependency('spdlog', required: false)
+spdlog_dep = dependency('spdlog', required: false, native: native)
 if not spdlog_dep.found()
     deps += dependency(
         'spdlog',
         required: true,
         fallback: 'spdlog',
+        native: native,
     )
 else
     deps += spdlog_dep
@@ -56,13 +65,25 @@ if not nlohmann_json_dep.found()
         'nlohmann_json',
         required: true,
         fallback: 'nlohmann_json',
+        native: native,
     )
 else
     deps += nlohmann_json_dep
 endif
 
-deps += dependency('tl-optional', required: true, fallback: ['tl-optional'])
-deps += dependency('magic_enum', required: true, fallback: ['magic_enum'])
+deps += dependency(
+    'tl-optional',
+    required: true,
+    fallback: ['tl-optional'],
+    native: native,
+)
+deps += dependency(
+    'magic_enum',
+    required: true,
+    fallback: ['magic_enum'],
+    native: native,
+)
+
 
 inc_dirs = []
 src_files = []
@@ -78,4 +99,5 @@ executable(
         'warning_level=3',
         'werror=true',
     ],
+    native: native,
 )
